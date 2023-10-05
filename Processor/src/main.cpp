@@ -32,9 +32,15 @@ int main(int argc, char* argv[])
     struct stack_t stk;
     stack_ctor(&stk);
 
+    for(int i = 0; i < text.n_lines; i++)
+    {
+        printf("%s\n", text.adress_of_str_parameters[i].ptr2str);
+    }
+    printf("JOPA");
     virtual_machine(&text, &stk);
 
     destructor(&text);
+
     /*char a[] = "svinina blyat";
 
     char b[30];

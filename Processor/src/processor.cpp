@@ -77,7 +77,7 @@ int read_command_func(struct Text* text, int counter)
 {
     int com_val;
 
-    sscanf(text->adress_of_str_parameters[counter].ptr2str, "%d", com_val);
+    sscanf(text->adress_of_str_parameters[counter].ptr2str, "%d", &com_val);
 
     if(com_val == PUSH)
         return PUSH;
@@ -119,7 +119,8 @@ int read_command_func(struct Text* text, int counter)
 void push_func(struct Text* text, struct stack_t* stk, int counter)
 {
     elem_t val;
-    sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("push"), "%d", &val);
+    int command;
+    sscanf(text->adress_of_str_parameters[counter].ptr2str, "%d %d", &command, &val);
 
     stack_push(stk, val);
 }
