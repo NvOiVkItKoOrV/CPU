@@ -20,33 +20,27 @@
 int main(int argc, char* argv[])
 {
 
-    if(argc = 0 || argc > 2)
+    if(argc == 0 || argc > 2)
     {
         printf("Wrong command file name!\n");
         exit(0);
     }
-    struct Text text = {};
-    text.f_name = argv[1];
-    constructor(&text);
 
-    struct stack_t stk;
-    stack_ctor(&stk);
+    struct processor_t proc;
+    proc.text.f_name = argv[1];
 
-    for(int i = 0; i < text.n_lines; i++)
-    {
-        printf("%s\n", text.adress_of_str_parameters[i].ptr2str);
-    }
-    printf("JOPA");
-    virtual_machine(&text, &stk);
+    proc_ctor(&proc);
 
-    destructor(&text);
+    //printf("%d\n", proc.text.size_of_buf);
+//
+    //for(int i = 0; i< proc.text.size_of_buf; i++)
+      //  printf("%d ",*(proc.text.adress_of_buf + i));
 
-    /*char a[] = "svinina blyat";
+    //printf("JOPA");
+    virtual_machine(&proc);
 
-    char b[30];
 
-    sscanf(a, "%s", b);
+    proc_dtor(&proc);
 
-    printf("%s", b);*/
     return 0;
 }

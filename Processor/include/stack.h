@@ -38,8 +38,8 @@ typedef unsigned long long canary_t;
 typedef unsigned long hash_t;
 
 
-#define CANARY_PROTECTION
-#define HASH_PROTECTION
+//#define CANARY_PROTECTION
+//#define HASH_PROTECTION
 
 const canary_t LEFT_CANARY_VALUE  = 0xBADDED;
 const canary_t RIGHT_CANARY_VALUE = 0xBE3BAB;
@@ -50,9 +50,9 @@ struct stack_t
         canary_t l_canary = LEFT_CANARY_VALUE;
     #endif
 
-    char* data; // elem_t* -> char*
-    long unsigned int size; // int -> some unsigned type
-    long unsigned int capacity; // int -> some usigned type
+    char* data;
+    long unsigned int size;
+    long unsigned int capacity;
 
     #ifdef CANARY_PROTECTION
         canary_t r_canary = RIGHT_CANARY_VALUE;

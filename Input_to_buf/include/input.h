@@ -16,8 +16,8 @@ struct Text
      struct Str_parameters* adress_of_str_parameters = nullptr;
  };
 
-void constructor(struct Text* text);
-void destructor(struct Text* text);
+void text_ctor(struct Text* text);
+void text_dtor(struct Text* text);
 void make_buf (struct Text* text);
 void input_to_buf (struct Text* text);
 void make_array_of_ptr_to_str(struct Text* text);

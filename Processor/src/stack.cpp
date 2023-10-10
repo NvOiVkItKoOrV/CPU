@@ -44,11 +44,15 @@ if(check_hash(stk))                                           \
 
 static void stack_resize(struct stack_t* stk, code_of_resize rsz_code);
 
+#ifdef CANARY_PROTECTION
 static int check_canary(const struct stack_t* stk);
+#endif /* CANARY_PROTECTION */
 
+#ifdef HASH_PROTECTION
 static hash_t    calc_hash     (const struct stack_t* stk);
 static hash_comp check_hash    (struct stack_t* stk);
 static void      calc_elem_hash(hash_t* hash, const void* parameter);
+#endif /* HASH_PROTECTION */
 
 static int  stack_verify(const struct stack_t* stk);
 static void stack_dump  (const struct stack_t* stk, const char* file_name, int n_line,
@@ -130,7 +134,7 @@ void stack_ctor(struct stack_t* stk)
         *(canary_t*)stk->data = LEFT_CANARY_VALUE_DATA;
         stk->data += sizeof(canary_t);
         *(canary_t*)(stk->data + stk->capacity * sizeof(elem_t)) = RIGHT_CANARY_VALUE_DATA;
-    #elif CANARY_PROTECTION == 1
+    #else
         stk->data = (char*)calloc(DEFAULT_STACK_CAPACITY * sizeof(elem_t), sizeof(char));
     #endif
 
@@ -169,7 +173,7 @@ void stack_dtor(struct stack_t* stk)
     #ifdef CANARY_PROTECTION
         stk->data -= sizeof(canary_t);
         free(stk->data);
-    #elif
+    #else
         free(stk->data);
     #endif
 
@@ -284,7 +288,7 @@ static void stack_resize(struct stack_t* stk, code_of_resize rsz_code)
             *(canary_t*)((elem_t*)stk->data + old_capacity) = 0;
             *(canary_t*)((elem_t*)stk->data + stk->capacity) = RIGHT_CANARY_VALUE_DATA;
         #else
-            stk->data = (char*)realloc(stk->data, (size_t)stk->capacity * sizeof(elem_t));
+            stk->data = (char*)realloc(stk->data, stk->capacity * sizeof(elem_t));
         #endif
     }
     else if(rsz_code == RESIZE_DOWN)
@@ -297,7 +301,7 @@ static void stack_resize(struct stack_t* stk, code_of_resize rsz_code)
             stk->data += sizeof(canary_t);
             *(canary_t*)((elem_t*)stk->data + stk->capacity) = RIGHT_CANARY_VALUE_DATA;
         #else
-            stk->data = (char*)realloc(stk->data, (size_t)stk->capacity * sizeof(elem_t));
+            stk->data = (char*)realloc(stk->data, stk->capacity * sizeof(elem_t));
         #endif
 
     }
