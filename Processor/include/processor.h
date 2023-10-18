@@ -21,7 +21,7 @@ enum commands
     DIV = 8,
 
     SIN  = 9,
-    COS  = 10,
+    COS  = 12,
     SQRT = 11
 };
 
@@ -61,5 +61,8 @@ void mul_func (struct processor_t* proc);
 void div_func (struct processor_t* proc);
 void in_func  (struct processor_t* proc);
 void out_func (struct processor_t* proc);
+void sqrt_func(struct processor_t* proc);
+void sin_func (struct processor_t* proc);
+void cos_func (struct processor_t* proc);
 
 #endif /* PROCESSOR_H */

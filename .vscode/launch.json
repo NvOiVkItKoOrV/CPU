@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/viktor/x-courses/Processor/Processor",
-      "program": "/home/viktor/x-courses/Processor/Processor/build/Debug/outDebug",
+      "cwd": "/home/viktor/x-courses/Processor/Assembler/src",
+      "program": "/home/viktor/x-courses/Processor/Assembler/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

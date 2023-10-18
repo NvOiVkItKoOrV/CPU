@@ -4,7 +4,7 @@
 #include "../include/disassembler.h" // -I ../include
 #include "../../Input_to_buf/include/input.h"
 
-void disassembly(struct Text* text)
+void disassembler(struct Text* text)
 {
     FILE* fp = fopen("Disassembler.txt", "w");
     int counter = 0;

@@ -1,6 +1,7 @@
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
 
+#include"../../Input_to_buf/include/input.h"
 
 enum commands
 {
@@ -20,7 +21,7 @@ enum commands
     DIV = 8,
 
     SIN  = 9,
-    COS  = 10,
+    COS  = 12,
     SQRT = 11
 };
 

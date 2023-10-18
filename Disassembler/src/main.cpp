@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
     constructor(&text);
 
-    disassembly(&text);
+    disassembler(&text);
 
     destructor(&text);
     return 0;

@@ -10,10 +10,15 @@
 
 void assembler(struct Text* text)
 {
+    assert(text);
+
     FILE* file_adress = fopen("../Assembler.txt", "w");
+    assert(text);
 
     size_t buf_size = text->n_lines * 20;
     char* bin_buf = (char*)calloc(buf_size, sizeof(char));
+    assert(bin_buf);
+
     char* buf_ptr2end = bin_buf;
 
     size_t counter = 0;
@@ -25,7 +30,7 @@ void assembler(struct Text* text)
         if(command_val == PUSH)
         {
             int val = 0;
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("push"), "%d", &val);
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + sizeof("push"), "%d", &val);
 
             *(buf_ptr2end) = PUSH;
               buf_ptr2end += sizeof(char);
@@ -33,12 +38,12 @@ void assembler(struct Text* text)
             memcpy(buf_ptr2end, &val, sizeof(elem_t));
             buf_ptr2end += sizeof(elem_t);
         }
-        if(command_val == RPUSH)
+        else if(command_val == RPUSH)
         {
 
             char reg_type[20] = {};
 
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("push"), "%s", reg_type);
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + sizeof("push"), "%s", reg_type);
 
             int reg_code = reg_type[1] - 'a';
             printf("%d", reg_code);
@@ -85,7 +90,7 @@ void assembler(struct Text* text)
                     break;
                 }
         }
-        if(command_val == POP)
+        else if(command_val == POP)
         {
             char reg_type[20] = {};
             sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("pop"), "%s", reg_type);
@@ -131,63 +136,19 @@ void assembler(struct Text* text)
                     break;
                 }
         }
-        if(command_val == HLT)
-        {
-            *(buf_ptr2end) = HLT;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == ADD)
-        {
-            *(buf_ptr2end) = ADD;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == SUB)
-        {
-            *(buf_ptr2end) = SUB;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == MUL)
-        {
-            *(buf_ptr2end) = MUL;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == DIV)
-        {
-            *(buf_ptr2end) = DIV;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == SQRT)
-        {
-            *(buf_ptr2end) = SQRT;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == SIN)
-        {
-            *(buf_ptr2end) = SIN;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == COS)
-        {
-            *(buf_ptr2end) = SIN;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == IN)
-        {
-            *(buf_ptr2end) = IN;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == OUT)
-        {
-            *(buf_ptr2end) = OUT;
-              buf_ptr2end +=sizeof(char);
-        }
-        if(command_val == ERR)
+        else if(command_val == ERR)
         {
             printf("Syntax error is assemler, %lu line", counter);
             exit(0);
         }
+        else
+        {
+            *(buf_ptr2end) = command_val;
+              buf_ptr2end +=sizeof(char);
+        }
         counter++;
     }
+
     for(int i = 0; i < buf_size; i++)
         printf("%d ", *(bin_buf + i));
 

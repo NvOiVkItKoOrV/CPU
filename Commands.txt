@@ -4,5 +4,8 @@ pop rax
 push 6
 push rax
 div
+push 0
+push 13
+cos
 out
 HLT

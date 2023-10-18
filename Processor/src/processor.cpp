@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "../include/stack.h"
 #include "../include/processor.h"
-#include "../../Input_to_buf/include/input.h"
+
 
 
 void proc_ctor(struct processor_t* proc)
@@ -73,15 +74,15 @@ void virtual_machine(struct processor_t* proc)
             break;
 
         case SQRT:
-            //sqrt_func();
+            sqrt_func(proc);
             break;
 
         case SIN:
-            //sin_func();
+            sin_func(proc);
             break;
 
         case COS:
-            //cos_func();
+            cos_func(proc);
             break;
 
         case IN:
@@ -332,3 +333,31 @@ void out_func(struct processor_t* proc)
     printf("%d\n", val);
 }
 
+
+void sqrt_func(struct processor_t* proc)
+{
+    elem_t val;
+    stack_pop(&proc->stk, &val);
+
+    val = sqrt(val);
+    stack_push(&proc->stk, val);
+}
+
+void sin_func(struct processor_t* proc)
+{
+    elem_t val;
+    stack_pop(&proc->stk, &val);
+printf("---------------------lfkjghkjhlkjdhgskdlfhgjlksfdjhg---------------------");
+    val = sin(val);
+    stack_push(&proc->stk, val);
+}
+
+void cos_func(struct processor_t* proc)
+{
+printf("---------------------------------------------------------------------------------------");
+    elem_t val;
+    stack_pop(&proc->stk, &val);
+
+    val = cos(val);
+    stack_push(&proc->stk, val);
+}

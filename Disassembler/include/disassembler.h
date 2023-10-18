@@ -17,7 +17,7 @@ enum commands
     OUT  =  9
 };
 
-void disassembly(struct Text* text);
+void disassembler(struct Text* text);
 int read_command_func(struct Text* text, int counter);
 
 #endif /* DISASSEMBLER_H */

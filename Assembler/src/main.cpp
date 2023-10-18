@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
+
     struct Text text = {};
     text.f_name = argv[1];
     //printf("%s", text.f_name);
