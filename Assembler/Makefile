@@ -14,6 +14,6 @@ FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop
 all: object
 
 object:
-	@ $(G++) $(FLAGS) src/main.cpp src/assembler.cpp ../Input_to_buf/src/input.cpp -o out
+	@ $(G++) $(FLAGS) src/main.cpp src/assembler.cpp src/labels.cpp ../Input_to_buf/src/input.cpp -o out
 run:
 	@ ./out ../Commands.txt

@@ -2,6 +2,7 @@
 #define ASSEMBLER_H
 
 #include"../../Input_to_buf/include/input.h"
+#include "labels.h"
 
 enum commands
 {
@@ -22,7 +23,10 @@ enum commands
 
     SIN  = 9,
     COS  = 12,
-    SQRT = 11
+    SQRT = 11,
+    JMP = 13,
+    LAB = 14,
+    COM = 15
 };
 
 enum registers
@@ -35,6 +39,6 @@ enum registers
 
 
 void assembler(struct Text* text);
-int read_command_func(struct Text* text, size_t counter);
-
+int read_command_func(struct Text* text, size_t counter, char* bin_buf, char* buf_ptr2end, label_t* adr_of_lab_array, size_t* labels_counter);
+void reg_func(int reg_code, char** buf_ptr2end, size_t counter, int command);
 #endif /* ASSEMBLER_H */

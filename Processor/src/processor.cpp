@@ -93,6 +93,10 @@ void virtual_machine(struct processor_t* proc)
             out_func(proc);
             break;
 
+        case JMP:
+            jmp_func(proc, &counter);
+            break;
+
         case HLT:
             exit(0);
             break;
@@ -153,6 +157,9 @@ int read_command_func(struct processor_t* proc, size_t* counter)
 
     else if(com_check == SIN)
         return SIN;
+
+    else if(com_check == JMP)
+        return JMP;
 
     else if(com_check == COS)
         return COS;
@@ -252,6 +259,17 @@ void pop_func(struct processor_t* proc, size_t* counter)
         printf("Wrong register number in pop function on %lu line\n", *counter);
         break;
     }
+
+}
+
+
+void jmp_func(struct processor_t* proc, size_t* counter)
+{
+    int adress2jmp;
+
+    memcpy(&adress2jmp, proc->text.adress_of_buf + *counter, sizeof(int));
+    *counter = adress2jmp;
+
 
 }
 

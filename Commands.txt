@@ -1,11 +1,10 @@
 push 1
 push 3
-pop rax
-push 6
-push rax
-div
-push 0
+next:
+;sadhjhfkhjsdhjhfhsidahkgjhfisdahkgjiodsahhkjufioughkajguiosaugkjhioaukfjdhifadskghlifdskhdsafkjafdshikljajfdshilkjgfdahifdagskjhfdskjlghdsafkjg
 push 13
+out
+jmp next
 cos
 out
 HLT

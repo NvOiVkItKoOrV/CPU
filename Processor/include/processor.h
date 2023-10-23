@@ -2,6 +2,7 @@
 #define PROCESSOR_H
 
 #include "../../Input_to_buf/include/input.h"
+#include "stack.h"
 
 enum commands
 {
@@ -22,7 +23,8 @@ enum commands
 
     SIN  = 9,
     COS  = 12,
-    SQRT = 11
+    SQRT = 11,
+    JMP = 13
 };
 
 enum registers
@@ -35,13 +37,12 @@ enum registers
 
 struct processor_t
 {
+    elem_t rax = 0;
+    elem_t rbx = 0;
+    elem_t rcx = 0;
+    elem_t rdx = 0;
     struct stack_t stk;
     struct Text text;
-
-    elem_t rax;
-    elem_t rbx;
-    elem_t rcx;
-    elem_t rdx;
 
 };
 
@@ -64,5 +65,6 @@ void out_func (struct processor_t* proc);
 void sqrt_func(struct processor_t* proc);
 void sin_func (struct processor_t* proc);
 void cos_func (struct processor_t* proc);
+void jmp_func(struct processor_t* proc, size_t* counter);
 
 #endif /* PROCESSOR_H */
