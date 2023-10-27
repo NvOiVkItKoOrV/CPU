@@ -24,7 +24,15 @@ enum commands
     SIN  = 9,
     COS  = 12,
     SQRT = 11,
-    JMP = 13
+    JMP = 13,
+    JA = 16, //  >
+    JAE = 17, // >=
+    JB = 18,//   <
+    JBE = 19,// <=
+    JE = 20,// ==
+    JNE = 21,
+    CALL = 22,
+    RET = 23
 };
 
 enum registers
@@ -41,8 +49,9 @@ struct processor_t
     elem_t rbx = 0;
     elem_t rcx = 0;
     elem_t rdx = 0;
+
     struct stack_t stk;
-    struct Text text;
+    struct Text binary_buf;
 
 };
 
@@ -66,5 +75,14 @@ void sqrt_func(struct processor_t* proc);
 void sin_func (struct processor_t* proc);
 void cos_func (struct processor_t* proc);
 void jmp_func(struct processor_t* proc, size_t* counter);
+
+void ja_func  (struct processor_t* proc, size_t* counter);
+void jae_func (struct processor_t* proc, size_t* counter);
+void jb_func  (struct processor_t* proc, size_t* counter);
+void jbe_func (struct processor_t* proc, size_t* counter);
+void je_func  (struct processor_t* proc, size_t* counter);
+void jne_func (struct processor_t* proc, size_t* counter);
+void call_func(struct processor_t* proc, size_t* counter);
+void ret_func (struct processor_t* proc, size_t* counter);
 
 #endif /* PROCESSOR_H */

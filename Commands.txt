@@ -1,10 +1,14 @@
+push 11
+pop rdx
 push 1
-push 3
+pop rax
+push 0
 next:
-;sadhjhfkhjsdhjhfhsidahkgjhfisdahkgjiodsahhkjufioughkajguiosaugkjhioaukfjdhifadskghlifdskhdsafkjafdshikljajfdshilkjgfdahifdagskjhfdskjlghdsafkjg
-push 13
+push 1
+add
+pop rbx
+push rbx
 out
-jmp next
-cos
-out
+push rbx
+jb next
 HLT

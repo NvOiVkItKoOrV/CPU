@@ -3,9 +3,10 @@
 #include <string.h>
 #include <assert.h>
 #include "../../Input_to_buf/include/input.h"
+#include "../../Processor/include/stack.h"
 #include "../include/assembler.h"
 #include "../include/labels.h"
-#include "../../Processor/include/stack.h"
+
 
 void assembler(struct Text* text)
 {
@@ -14,166 +15,163 @@ void assembler(struct Text* text)
     FILE* file_adress = fopen("../Assembler.txt", "w");
     assert(text);
 
-    size_t buf_size = text->n_lines * 30;
+    size_t buf_size = text->n_lines * SIZE_OF_BUF;
     char* bin_buf = (char*)calloc(buf_size, sizeof(char));
-    assert(bin_buf);
 
     char* buf_ptr2end = bin_buf;
     size_t counter = 0;
+    int cmd_name_length = 0;
 
     label_t* adr_of_lab_array = array_of_labels_ctor();
     size_t labels_counter = 0;
 
     while(counter < text->n_lines)
     {
-        int command_val = read_command_func(text, counter, bin_buf, buf_ptr2end, adr_of_lab_array, &labels_counter);
+        int command_val = read_command_func(text, counter, bin_buf, buf_ptr2end, adr_of_lab_array, &labels_counter, &cmd_name_length);
 
-        if(command_val == PUSH)
+        switch(command_val)
         {
-            int val = 0;
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + sizeof("push"), "%d", &val);
+        case PUSH:
+        {
+            elem_t val = 0;
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + cmd_name_length, "%d", &val);
 
             *(buf_ptr2end) = PUSH;
               buf_ptr2end += sizeof(char);
 
             memcpy(buf_ptr2end, &val, sizeof(elem_t));
             buf_ptr2end += sizeof(elem_t);
+            break;
         }
-        else if(command_val == RPUSH)
+        case RPUSH:
         {
 
-            char reg_type[20] = {};
+            char reg_type[SIZE_OF_BUF] = {};
 
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + sizeof("push"), "%s", reg_type);
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + cmd_name_length, "%s", reg_type);
 
             int reg_code = reg_type[1] - 'a';
-
             reg_func(reg_code, &buf_ptr2end, counter, command_val);
+            break;
         }
-        else if(command_val == POP)
+        case POP:
         {
-            char reg_type[20] = {};
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("pop"), "%s", reg_type);
+            char reg_type[SIZE_OF_BUF] = {};
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + cmd_name_length, "%s", reg_type);
 
             int reg_code = reg_type[1] - 'a';
-
             reg_func(reg_code, &buf_ptr2end, counter, command_val);
+            break;
         }
-        else if(command_val == JMP)
+        case JMP:
+        case JA:
+        case JAE:
+        case JB:
+        case JBE:
+        case JE:
+        case JNE:
+        case CALL:
         {
-            char label_name[20] = {};
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + sizeof("jmp"), "%s", label_name);
+            char label_name[SIZE_OF_BUF] = {};
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + cmd_name_length, "%s", label_name);
 
-            int lab_adr_checker = lab_name_exists_check(adr_of_lab_array, label_name);
+            int lab_adr_checker = lab_name_exists(adr_of_lab_array, label_name);
 
             if(lab_adr_checker == incorrect_adress)
             {
-                strcat(adr_of_lab_array[labels_counter].lab_name, label_name);
-                adr_of_lab_array[labels_counter].sourse_adresses[0] = buf_ptr2end - bin_buf;
-                //printf("%d", adr_of_lab_array[labels_counter].sourse_adresses[0]);
-                adr_of_lab_array[labels_counter].srs_adr_counter++;
+                strcat(adr_of_lab_array[labels_counter].lab_name, label_name);//strcpy
+                adr_of_lab_array[labels_counter].source_adresses[0] = (buf_ptr2end - bin_buf)/sizeof(char);
+
+                adr_of_lab_array[labels_counter].src_adr_counter++;
                 labels_counter++;
             }
             else
             {
-                int srs_counter = adr_of_lab_array[lab_adr_checker].srs_adr_counter;
+                int src_counter = adr_of_lab_array[lab_adr_checker].src_adr_counter;
 
-                if(srs_counter == max_sourse_adresses_array_length - 1)
-                    printf("Array of sourse adresses is overflow in line: %lu \n", counter);
+                if(src_counter == max_source_adresses_array_length - 1)
+                    printf("Array of source adresses is overflow in line: %d \n", counter);
 
-                int index = buf_ptr2end - bin_buf;
+                int index = (buf_ptr2end - bin_buf)/sizeof(char);
 
-                adr_of_lab_array[lab_adr_checker].sourse_adresses[srs_counter] = index;
-                adr_of_lab_array[lab_adr_checker].srs_adr_counter++;
+                adr_of_lab_array[lab_adr_checker].source_adresses[src_counter] = index;
+                adr_of_lab_array[lab_adr_checker].src_adr_counter++;
 
 
             }
 
-            *(buf_ptr2end) = JMP;
+          *(buf_ptr2end) = (char)command_val;
             buf_ptr2end += sizeof(char);
             buf_ptr2end += sizeof(int);
-
+            break;
         }
-        else if(command_val == ERR)
+        case ERR:
         {
             printf("Syntax error is assemler, %lu line", counter);
             exit(0);
+            break;
         }
-        else if(command_val == LAB || command_val == COM)
-        {}
-        else
+        case COMMENT:
+        case LAB:       // switch
         {
-            *(buf_ptr2end) = command_val;
+            break;
+        }
+        default:
+        {
+            *(buf_ptr2end) =(char)command_val;
               buf_ptr2end +=sizeof(char);
+              break;
+        }
         }
         counter++;
     }
 
-    //put jump values to binary buffer
     fill_adresses2jump(text, bin_buf, buf_size, adr_of_lab_array);
 
     for(int i = 0; i < buf_size; i++)
-        printf("%u ", *(bin_buf + i));
-
+        printf("%d ", *(bin_buf + i));
+    printf("\n\n");
+    for(size_t i = 0; i < max_lab_array_sz; i++) {
+        printf("label %s  %d\t", adr_of_lab_array[i].lab_name, adr_of_lab_array[i].destination_adress);
+    }
+    printf("\n");
     array_of_labels_dtor(adr_of_lab_array);
     fwrite(bin_buf, sizeof(char), buf_size, file_adress);
     free(bin_buf);
+    fclose(file_adress);
+
 }
 
 
-int read_command_func(struct Text* text, size_t counter, char* bin_buf, char* buf_ptr2end, label_t* adr_of_lab_array, size_t* labels_counter)
+int read_command_func(struct Text* text, size_t counter,            char* bin_buf,          char* buf_ptr2end,
+                                         label_t* adr_of_lab_array, size_t* labels_counter, int* cmd_name_length)
 {
     assert(text);
     assert(labels_counter);
 
-    char buffer[20] = {};
+    char buffer[SIZE_OF_BUF] = {};
     sscanf(text->adress_of_str_parameters[counter].ptr2str, "%s", buffer);
-    assert(buffer);
 
-    if(text->adress_of_str_parameters[counter].ptr2str[0] == ';')
+    if(buffer[0] == ';')
     {
-        return COM;
+        return COMMENT;
     }
-    else if(buffer[strlen(buffer) - 1] == ':')   //strchr
+    else if(buffer[strlen(buffer) - 1] == ':')
     {
-        buffer[strlen(buffer) - 1] = '\0';
-
-        int lab_adress = lab_name_exists_check(adr_of_lab_array, buffer);
-
-        if(lab_adress == incorrect_adress)
-        {
-            lab_adress = *labels_counter;
-            strcpy(adr_of_lab_array[*labels_counter].lab_name, buffer);
-            (*labels_counter)++;
-
-            printf("counter %d\n", lab_adress);
-            adr_of_lab_array[lab_adress].destination_adress = buf_ptr2end - bin_buf;
-        }
-        else
-        {
-            printf("debug\n");
-            if(adr_of_lab_array[lab_adress].destination_adress == incorrect_adress)
-            {
-                printf("Debug Addres %d\n", buf_ptr2end - bin_buf);
-                adr_of_lab_array[lab_adress].destination_adress = buf_ptr2end - bin_buf;
-            }
-            else
-            {
-                printf("Error in %lu line! This label: <%s> already exist!!!\n", counter, buffer);
-                abort();
-            }
-        }
+        make_or_check_label(text, counter, bin_buf, buf_ptr2end, buffer, adr_of_lab_array, labels_counter, cmd_name_length);
         return LAB;
     }
     else
     {
         if(!strcmp(buffer, "push"))
         {
-            char push_val[20] = {};
+            *cmd_name_length = sizeof("push");
 
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("push"), "%s", push_val);
+            char push_val[SIZE_OF_BUF] = {};
 
-            if(strlen(push_val) == 3 && push_val[0] == 'r' && push_val[2] == 'x')
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + *cmd_name_length, "%s", push_val);
+
+            if(push_val[0] == 'r' && push_val[2] == 'x' && strlen(push_val) == 3)
                 return RPUSH;
 
             else
@@ -181,90 +179,202 @@ int read_command_func(struct Text* text, size_t counter, char* bin_buf, char* bu
         }
         else if(!strcmp(buffer, "pop"))
         {
-            char pop_val[10] = {};
-            sscanf(text->adress_of_str_parameters[counter].ptr2str + strlen("pop"), "%s", pop_val);
+            *cmd_name_length = sizeof("pop");
 
-            if(strlen(pop_val) == 3 && pop_val[0] == 'r' && pop_val[2] == 'x')
+            char pop_val[SIZE_OF_BUF] = {};
+            sscanf(text->adress_of_str_parameters[counter].ptr2str + *cmd_name_length, "%s", pop_val);
+
+            if(pop_val[0] == 'r' && pop_val[2] == 'x' && strlen(pop_val) == strlen("r_x"))
                 return POP;
-
+            else
+            {
+                printf("Wrong register in %d line!\n", counter);
+                return ERR;
+            }
         }
         else if(!strcmp(buffer, "add"))
+        {
+            *cmd_name_length = sizeof("add");
             return ADD;
+        }
 
         else if(!strcmp(buffer, "sub"))
+        {
+            *cmd_name_length = sizeof("sub");
             return SUB;
+        }
 
         else if(!strcmp(buffer, "mul"))
+        {
+            *cmd_name_length = sizeof("mul");
             return MUL;
+        }
 
         else if(!strcmp(buffer, "div"))
+        {
+            *cmd_name_length = sizeof("div");
             return DIV;
+        }
 
         else if(!strcmp(buffer, "sqrt"))
+        {
+            *cmd_name_length = sizeof("sqrt");
             return SQRT;
+        }
 
         else if(!strcmp(buffer, "sin"))
+        {
+            *cmd_name_length = sizeof("sin");
             return SIN;
+        }
 
         else if(!strcmp(buffer, "cos"))
+        {
+            *cmd_name_length = sizeof("cos");
             return COS;
+        }
 
         else if(!strcmp(buffer, "in"))
+        {
+            *cmd_name_length = sizeof("in");
             return IN;
+        }
 
         else if(!strcmp(buffer, "out"))
+        {
+            *cmd_name_length = sizeof("out");
             return OUT;
+        }
 
         else if(!strcmp(buffer, "jmp"))
+        {
+            *cmd_name_length = sizeof("jmp");
             return JMP;
-
+        }
         else if(!strcmp(buffer, "HLT"))
+        {
+            *cmd_name_length = sizeof("HLT");
             return HLT;
+        }
 
+        else if(!strcmp(buffer, "ja"))
+        {
+            *cmd_name_length = sizeof("ja");
+            return JA;
+        }
+
+        else if(!strcmp(buffer, "jae"))
+        {
+            *cmd_name_length = sizeof("jae");
+            return JAE;
+        }
+
+        else if(!strcmp(buffer, "jb"))
+        {
+            *cmd_name_length = sizeof("jb");
+            return JB;
+        }
+
+        else if(!strcmp(buffer, "jbe"))
+        {
+            *cmd_name_length = sizeof("jbe");
+            return JBE;
+        }
+
+        else if(!strcmp(buffer, "je"))
+        {
+            *cmd_name_length = sizeof("je");
+            return JE;
+        }
+
+        else if(!strcmp(buffer, "jne"))
+        {
+            *cmd_name_length = sizeof("jne");
+            return JNE;
+        }
+        else if(!strcmp(buffer, "call"))
+        {
+            *cmd_name_length = sizeof("call");
+            return CALL;
+        }
+        else if(!strcmp(buffer, "ret"))
+        {
+            *cmd_name_length = sizeof("ret");
+            return RET;
+        }
         else
             return ERR;
     }
 }
 
 
-void reg_func(int reg_code, char** buf_ptr2end, size_t counter, int command)
+void reg_func(int reg_code, char** buf_ptr2end,size_t counter, int command)
 {
-                switch(reg_code)
-                {
-                case REG_A:
-                    **buf_ptr2end = (char)command;
-                    *buf_ptr2end +=sizeof(char);
+    switch(reg_code)
+    {
+    case REG_A:
+        **buf_ptr2end  = (char)command;
+            *buf_ptr2end += sizeof(char);
 
-                    **buf_ptr2end = REG_A;
-                    *buf_ptr2end +=sizeof(char);
-                    break;
+        **buf_ptr2end = REG_A;
+            *buf_ptr2end += sizeof(char);
+        break;
 
-                case REG_B:
-                    **buf_ptr2end = (char)command;
-                    *buf_ptr2end +=sizeof(char);
+    case REG_B:
+        **buf_ptr2end = (char)command;
+            *buf_ptr2end +=sizeof(char);
 
-                    **buf_ptr2end = REG_B;
-                    *buf_ptr2end +=sizeof(char);
-                    break;
+        **buf_ptr2end = REG_B;
+            *buf_ptr2end +=sizeof(char);
+        break;
 
-                case REG_C:
-                    **buf_ptr2end = (char)command;
-                    *buf_ptr2end +=sizeof(char);
+    case REG_C:
+        **buf_ptr2end = (char)command;
+            *buf_ptr2end +=sizeof(char);
 
-                    **buf_ptr2end = (char)REG_C;
-                    *buf_ptr2end +=sizeof(char);
-                    break;
+        **buf_ptr2end = (char)REG_C;
+            *buf_ptr2end +=sizeof(char);
+        break;
 
-                case REG_D:
-                    **buf_ptr2end = (char)command;
-                    *buf_ptr2end +=sizeof(char);
+    case REG_D:
+        **buf_ptr2end = (char)command;
+            *buf_ptr2end +=sizeof(char);
 
-                    **buf_ptr2end = REG_D;
-                    *buf_ptr2end +=sizeof(char);
-                    break;
+        **buf_ptr2end = REG_D;
+            *buf_ptr2end +=sizeof(char);
+        break;
 
-                default:
-                    printf("This register type doesn't exist on %lu line", counter);
-                    break;
-                }
+    default:
+        printf("This register type doesn't exist on %d line", counter);
+        break;
+    }
+}
+
+void make_or_check_label(struct Text* text, size_t counter,            char* bin_buf,          char* buf_ptr2end,
+                         char* buffer,      label_t* adr_of_lab_array, size_t* labels_counter, int* cmd_name_length)
+{
+        buffer[strlen(buffer) - 1] = '\0';
+
+        int lab_adress = lab_name_exists(adr_of_lab_array, buffer);
+
+        if(lab_adress == incorrect_adress)
+        {
+            strcpy(adr_of_lab_array[*labels_counter].lab_name, buffer);
+
+            adr_of_lab_array[*labels_counter].destination_adress = buf_ptr2end - bin_buf;
+            printf("Debug %d address %d\n", *labels_counter, adr_of_lab_array[*labels_counter].destination_adress);
+            (*labels_counter)++;
+        }
+        else
+        {
+            if(adr_of_lab_array[lab_adress].destination_adress == incorrect_adress)
+            {
+                adr_of_lab_array[lab_adress].destination_adress = (buf_ptr2end - bin_buf)/sizeof(char);
+            }
+            else
+            {
+                printf("Error in %lu line! This label: <%s> already exist!!!\n", counter, buffer);
+                abort();
+            }
+        }
 }

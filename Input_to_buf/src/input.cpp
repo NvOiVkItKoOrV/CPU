@@ -6,7 +6,7 @@
 #include "../include/input.h"
 
 
-void text_ctor(struct Text* text)
+void buf_ctor(struct Text* text)
 {
     make_buf(text);
     input_to_buf(text);
@@ -91,7 +91,7 @@ void symb_counter(struct Text* text)
 }
 
 
-void text_dtor(struct Text* text)
+void buf_dtor(struct Text* text)
 {
     free(text->adress_of_buf);
     free(text->adress_of_str_parameters);

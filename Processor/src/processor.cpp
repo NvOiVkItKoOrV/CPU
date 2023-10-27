@@ -6,11 +6,10 @@
 #include "../include/processor.h"
 
 
-
 void proc_ctor(struct processor_t* proc)
 {
     stack_ctor(&(proc->stk));
-    text_ctor(&(proc->text));
+    buf_ctor(&(proc->binary_buf));
 
     proc->rax = 0;
     proc->rbx = 0;
@@ -23,7 +22,7 @@ void proc_ctor(struct processor_t* proc)
 void proc_dtor(struct processor_t* proc)
 {
     stack_dtor(&(proc->stk));
-    text_dtor(&(proc->text));
+    buf_dtor(&(proc->binary_buf));
 
     proc->rax = 0;
     proc->rbx = 0;
@@ -97,12 +96,44 @@ void virtual_machine(struct processor_t* proc)
             jmp_func(proc, &counter);
             break;
 
+        case JA:
+            ja_func(proc, &counter);
+            break;
+
+        case JAE:
+            jae_func(proc, &counter);
+            break;
+
+        case JB:
+            jb_func(proc, &counter);
+            break;
+
+        case JBE:
+            jbe_func(proc, &counter);
+            break;
+
+        case JE:
+            je_func(proc, &counter);
+            break;
+
+        case JNE:
+            jne_func(proc, &counter);
+            break;
+
+        case CALL:
+            call_func(proc, &counter);
+            break;
+
+        case RET:
+            ret_func(proc, &counter);
+            break;
+
         case HLT:
             exit(0);
             break;
 
         default:
-            printf("Syntax error! Wrong command in %lu line!\n", counter);
+            printf("Syntax error! Wrong command in %lu byte!\n", counter);
             exit(0);
             break;
 
@@ -115,81 +146,92 @@ int read_command_func(struct processor_t* proc, size_t* counter)
 {
     char com_val;
 
-    //sscanf(proc->text.adress_of_buf + *counter, "%d", &com_val);
-    memcpy(&com_val, proc->text.adress_of_buf + *counter, sizeof(char));
+    memcpy(&com_val, proc->binary_buf.adress_of_buf + *counter, sizeof(char));
     *counter += sizeof(char);
 
-    char com_check = 63;// 1 1 1 1 1 1 0 0
-
-    com_check = (com_check & com_val);
-
-    if(com_check == PUSH)
+    switch(com_val)
     {
-        if(com_val == RPUSH)
-            return RPUSH;
+    case PUSH:
+        return PUSH;
 
-        else if(com_val == PUSH)
-            return PUSH;
+    case RPUSH:
+        return RPUSH;
 
-        else
-        {
-            printf("Error in reading command in push checking!\n");
-            return ERR;
-        }
-    }
-    else if(com_check == ADD)
+    case ADD:
         return ADD;
 
-    else if(com_check == POP)
+    case POP:
         return POP;
 
-    else if(com_check == SUB)
+    case SUB:
         return SUB;
 
-    else if(com_check == MUL)
+    case MUL:
         return MUL;
 
-    else if(com_check == DIV)
+    case DIV:
         return DIV;
 
-    else if(com_check == SQRT)
+    case SQRT:
         return SQRT;
 
-    else if(com_check == SIN)
+    case SIN:
         return SIN;
 
-    else if(com_check == JMP)
-        return JMP;
-
-    else if(com_check == COS)
+    case COS:
         return COS;
 
-    else if(com_check == IN)
+    case JMP:
+        return JMP;
+
+    case IN:
         return IN;
 
-    else if(com_check == OUT)
+    case OUT:
         return OUT;
 
-    else if(com_check == HLT)
+    case JA:
+        return JA;
+
+    case JAE:
+        return JAE;
+
+    case JB:
+        return JB;
+
+    case JBE:
+        return JBE;
+
+    case JE:
+        return JE;
+
+    case JNE:
+        return JNE;
+
+    case CALL:
+        return CALL;
+
+    case RET:
+        return RET;
+
+    case HLT:
         return HLT;
 
-    else
+    default:
         return ERR;
+    }
 }
 
 
-void push_func(struct processor_t* proc,int push_type, size_t* counter)
+void push_func(struct processor_t* proc, int push_type, size_t* counter)
 {
     switch(push_type)
     {
     case PUSH:
         {
-
         elem_t val;
-        //sscanf((int*)(proc->text.adress_of_buf + *counter), "%d",&val);
-        memcpy(&val, (int*)(proc->text.adress_of_buf + *counter), sizeof(elem_t));
 
-        //printf("\n %d \n", val);
+        memcpy(&val, (int*)(proc->binary_buf.adress_of_buf + *counter), sizeof(elem_t));
 
         *counter += sizeof(elem_t);
 
@@ -200,7 +242,7 @@ void push_func(struct processor_t* proc,int push_type, size_t* counter)
         {
             char reg_code;
 
-            memcpy(&reg_code, proc->text.adress_of_buf + *counter, sizeof(char));
+            memcpy(&reg_code, proc->binary_buf.adress_of_buf + *counter, sizeof(char));
             *counter += sizeof(char);
 
                 switch(reg_code)
@@ -222,9 +264,13 @@ void push_func(struct processor_t* proc,int push_type, size_t* counter)
                     break;
 
                 default:
-                    printf("Wrong register number in push function on %lu line\n", *counter);
+                    printf("Wrong register number in push function on %lu byte\n", *counter);
                     break;
                 }
+            printf("push rax - <%lu> ",proc->rax);
+            printf("rbx - <%lu> ",proc->rbx);
+            printf("rcx - <%lu> ",proc->rcx);
+            printf("rdx - <%lu>\n",proc->rdx);
         }
     }
 }
@@ -234,7 +280,7 @@ void pop_func(struct processor_t* proc, size_t* counter)
 {
     char reg_code;
 
-    memcpy(&reg_code, proc->text.adress_of_buf + *counter, sizeof(char));
+    memcpy(&reg_code, proc->binary_buf.adress_of_buf + *counter, sizeof(char));
     *counter += sizeof(char);
 
     switch(reg_code)
@@ -256,21 +302,131 @@ void pop_func(struct processor_t* proc, size_t* counter)
         break;
 
     default:
-        printf("Wrong register number in pop function on %lu line\n", *counter);
+        printf("Wrong register number in pop function on %lu byte\n", *counter);
         break;
     }
-
+            printf("pop rax - <%lu> ",proc->rax);
+            printf("rbx - <%lu> ",proc->rbx);
+            printf("rcx - <%lu> ",proc->rcx);
+            printf("rdx - <%lu>\n",proc->rdx);
 }
 
 
 void jmp_func(struct processor_t* proc, size_t* counter)
 {
-    int adress2jmp;
+    int adress2jmp = -1;
 
-    memcpy(&adress2jmp, proc->text.adress_of_buf + *counter, sizeof(int));
+    memcpy(&adress2jmp, proc->binary_buf.adress_of_buf + *counter, sizeof(int));
     *counter = adress2jmp;
+}
 
 
+void ja_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+
+    if(value > proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
+
+}
+
+
+void jae_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+
+    if(value >= proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
+
+}
+
+
+void jb_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+    printf("stack_pop - <%d>", value);
+    if(value < proc->rdx)
+    {
+        printf("<%d< c-ter", *counter);
+        jmp_func(proc, counter);
+        printf("sadfhoiajhds");
+        printf("<%d< c-ter", *counter);
+    }
+    else
+    {
+        printf("pkfkjsidf");
+        (*counter) += sizeof(int);
+    }
+
+}
+
+
+void jbe_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+
+    if(value <= proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
+
+}
+
+
+void je_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+
+    if(value == proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
+}
+
+
+void jne_func(struct processor_t* proc, size_t* counter)
+{
+    elem_t value = 0;
+    stack_pop(&proc->stk, &value);
+
+    if(value != proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
+
+}
+
+
+void call_func(struct processor_t* proc, size_t* counter)
+{
+    proc->rdx = *counter + sizeof(int);
+    printf("%d sdhjflks,dfjgslfdighkjlfdsikhlgifhkj",*(int*)(proc->binary_buf.adress_of_buf + *counter));
+    printf("<%d>counter", *counter);
+    //memcpy(counter, proc->binary_buf.adress_of_buf + *counter, sizeof(int));
+    printf("<%d>counter", *counter);
+    jmp_func(proc, counter);
+}
+
+
+void ret_func(struct processor_t* proc, size_t* counter)
+{
+    int ret_adr = proc->rdx;
+
+    memcpy(counter, &ret_adr, sizeof(int));
 }
 
 
@@ -348,7 +504,7 @@ void out_func(struct processor_t* proc)
 {
     elem_t val = 0;
     stack_pop(&proc->stk, &val);
-    printf("%d\n", val);
+    printf("<<%d>>\n", val);
 }
 
 
@@ -361,18 +517,19 @@ void sqrt_func(struct processor_t* proc)
     stack_push(&proc->stk, val);
 }
 
+
 void sin_func(struct processor_t* proc)
 {
     elem_t val;
     stack_pop(&proc->stk, &val);
-printf("---------------------lfkjghkjhlkjdhgskdlfhgjlksfdjhg---------------------");
+
     val = sin(val);
     stack_push(&proc->stk, val);
 }
 
+
 void cos_func(struct processor_t* proc)
 {
-printf("---------------------------------------------------------------------------------------");
     elem_t val;
     stack_pop(&proc->stk, &val);
 

@@ -16,13 +16,13 @@ int main(int argc, char* argv[])
     }
 
     struct processor_t proc;
-    proc.text.f_name = argv[1];
+    proc.binary_buf.f_name = argv[1];
 
 
     proc_ctor(&proc);
 
-    for(int i = 0; i < proc.text.size_of_buf; i++)
-        printf("%d ", *(proc.text.adress_of_buf + i));
+    for(int i = 0; i < proc.binary_buf.size_of_buf; i++)
+        printf("%d ", *(proc.binary_buf.adress_of_buf + i));
 
     virtual_machine(&proc);
 

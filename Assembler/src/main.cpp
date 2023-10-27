@@ -18,10 +18,10 @@ int main(int argc, char* argv[])
     text.f_name = argv[1];
     //printf("%s", text.f_name);
 
-    text_ctor(&text);
+    buf_ctor(&text);
 
     assembler(&text);
 
-    text_dtor(&text);
+    buf_dtor(&text);
     return 0;
 }
