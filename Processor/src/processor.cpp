@@ -267,10 +267,6 @@ void push_func(struct processor_t* proc, int push_type, size_t* counter)
                     printf("Wrong register number in push function on %lu byte\n", *counter);
                     break;
                 }
-            printf("push rax - <%lu> ",proc->rax);
-            printf("rbx - <%lu> ",proc->rbx);
-            printf("rcx - <%lu> ",proc->rcx);
-            printf("rdx - <%lu>\n",proc->rdx);
         }
     }
 }
@@ -305,10 +301,6 @@ void pop_func(struct processor_t* proc, size_t* counter)
         printf("Wrong register number in pop function on %lu byte\n", *counter);
         break;
     }
-            printf("pop rax - <%lu> ",proc->rax);
-            printf("rbx - <%lu> ",proc->rbx);
-            printf("rcx - <%lu> ",proc->rcx);
-            printf("rdx - <%lu>\n",proc->rdx);
 }
 
 
@@ -353,20 +345,12 @@ void jb_func(struct processor_t* proc, size_t* counter)
 {
     elem_t value = 0;
     stack_pop(&proc->stk, &value);
-    printf("stack_pop - <%d>", value);
-    if(value < proc->rdx)
-    {
-        printf("<%d< c-ter", *counter);
-        jmp_func(proc, counter);
-        printf("sadfhoiajhds");
-        printf("<%d< c-ter", *counter);
-    }
-    else
-    {
-        printf("pkfkjsidf");
-        (*counter) += sizeof(int);
-    }
 
+    if(value < proc->rdx)
+        jmp_func(proc, counter);
+
+    else
+        (*counter) += sizeof(int);
 }
 
 
@@ -414,10 +398,7 @@ void jne_func(struct processor_t* proc, size_t* counter)
 void call_func(struct processor_t* proc, size_t* counter)
 {
     proc->rdx = *counter + sizeof(int);
-    printf("%d sdhjflks,dfjgslfdighkjlfdsikhlgifhkj",*(int*)(proc->binary_buf.adress_of_buf + *counter));
-    printf("<%d>counter", *counter);
-    //memcpy(counter, proc->binary_buf.adress_of_buf + *counter, sizeof(int));
-    printf("<%d>counter", *counter);
+
     jmp_func(proc, counter);
 }
 
@@ -454,7 +435,7 @@ void sub_func(struct processor_t* proc)
     stack_pop(&proc->stk, &val_1);
     stack_pop(&proc->stk, &val_2);
 
-    sub = val_1 - val_2;
+    sub = val_2 - val_1 ;
 
     stack_push(&proc->stk, sub);
 }
@@ -504,7 +485,7 @@ void out_func(struct processor_t* proc)
 {
     elem_t val = 0;
     stack_pop(&proc->stk, &val);
-    printf("<<%d>>\n", val);
+    printf("<%d>\n", val);
 }
 
 

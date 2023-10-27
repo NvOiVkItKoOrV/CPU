@@ -21,9 +21,6 @@ int main(int argc, char* argv[])
 
     proc_ctor(&proc);
 
-    for(int i = 0; i < proc.binary_buf.size_of_buf; i++)
-        printf("%d ", *(proc.binary_buf.adress_of_buf + i));
-
     virtual_machine(&proc);
 
     proc_dtor(&proc);
