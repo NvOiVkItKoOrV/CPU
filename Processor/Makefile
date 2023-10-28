@@ -1,4 +1,8 @@
-G++ = g++
+SRC = src/
+OBJ = obj/
+INPUT = ../Input_to_buf/
+CMD_FILE = ../Assembler.txt
+
 FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations 											\
 		-Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported 						\
   		-Wconversion -Wctor-dtor-privacy -Wempty-body -Wfloat-equal -Wformat-nonliteral -Wformat-security 								\
@@ -11,9 +15,22 @@ FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop
 		-Wlarger-than=8192 -Wstack-usage=8192 -pie -fPIE -Werror=vla 																	\
 		-fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr \
 
-all: object
+all: bin
 
-object:
-	@ $(G++) $(FLAGS) src/main.cpp src/processor.cpp ../Input_to_buf/src/input.cpp src/stack.cpp -o out
+bin: $(OBJ)main.o $(OBJ)input.o $(OBJ)processor.o $(OBJ)stack.o
+	@ g++ $(FLAGS) $^ -o $@
+
+$(OBJ)main.o: $(SRC)main.cpp
+	@ g++ -c -I$(INPUT)/include -I./include $(FLAGS) $< -o $(OBJ)main.o
+
+$(OBJ)input.o: $(INPUT)$(SRC)input.cpp
+	@ g++ -c -I$(INPUT)/include -I./include $(FLAGS) $< -o $(OBJ)input.o
+
+$(OBJ)processor.o: $(SRC)processor.cpp
+	@ g++ -c -I$(INPUT)/include -I./include $(FLAGS) $< -o $(OBJ)processor.o
+
+$(OBJ)stack.o: $(SRC)stack.cpp
+	@ g++ -c -I$(INPUT)/include -I./include $(FLAGS) $< -o $(OBJ)stack.o
+
 run:
-	@ ./out ../Assembler.txt
+	@ ./bin $(CMD_FILE)

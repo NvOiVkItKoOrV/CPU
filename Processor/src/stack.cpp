@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/stack.h"
+#include "stack.h"
 
 static int error_code = NO_ERR;
 

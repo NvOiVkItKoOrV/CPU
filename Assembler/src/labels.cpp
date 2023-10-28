@@ -37,7 +37,6 @@ int lab_name_exists(label_t* array_of_lab, char* new_lab_name)
 {
     for(int lab_counter = 0; lab_counter < max_lab_array_sz; lab_counter++)
     {
-       //printf("%d %d %s\n", lab_counter, array_of_lab[lab_counter].destination_adress, array_of_lab[lab_counter].lab_name);
        if(!strcmp(array_of_lab[lab_counter].lab_name, new_lab_name))
            return lab_counter;
     }
@@ -78,8 +77,6 @@ void fill_adresses2jump(struct Text* text, char* bin_buf, size_t bin_buf_size, l
             for(size_t lines_counter = 0; lines_counter < text->n_lines; lines_counter++)
             {
                 char buffer[max_lab_name_length] = {};
-
-                //printf("%s\n", text->adress_of_str_parameters[lines_counter].ptr2str);
 
                 sscanf(text->adress_of_str_parameters[lines_counter].ptr2str,"%s",buffer);
                 if(!strcmp(buffer, "ja")  || !strcmp(buffer, "jae") || !strcmp(buffer, "jb") || !strcmp(buffer, "jmp") ||

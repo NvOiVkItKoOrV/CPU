@@ -112,7 +112,7 @@ void assembler(struct Text* text)
             break;
         }
         case COMMENT:
-        case LAB:       // switch
+        case LAB:
         {
             break;
         }
@@ -128,14 +128,8 @@ void assembler(struct Text* text)
 
     fill_adresses2jump(text, bin_buf, buf_size, adr_of_lab_array);
 
-    for(int i = 0; i < buf_size; i++)
-        printf("%d ", *(bin_buf + i));
-    printf("\n\n");
-    for(size_t i = 0; i < max_lab_array_sz; i++) {
-        printf("label %s  %d\t", adr_of_lab_array[i].lab_name, adr_of_lab_array[i].destination_adress);
-    }
-    printf("\n");
     array_of_labels_dtor(adr_of_lab_array);
+
     fwrite(bin_buf, sizeof(char), buf_size, file_adress);
     free(bin_buf);
     fclose(file_adress);

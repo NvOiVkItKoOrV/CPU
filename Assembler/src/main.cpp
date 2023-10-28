@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/assembler.h"
-#include "../../Input_to_buf/include/input.h"
+#include "assembler.h"
+#include "input.h"
 
 int main(int argc, char* argv[])
 {
@@ -13,10 +13,8 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
-
     struct Text text = {};
     text.f_name = argv[1];
-    //printf("%s", text.f_name);
 
     buf_ctor(&text);
 

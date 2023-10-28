@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../Input_to_buf/include/input.h"
-#include "../include/stack.h"
-#include "../include/processor.h"
+#include "input.h"
+#include "stack.h"
+#include "processor.h"
 
 int main(int argc, char* argv[])
 {

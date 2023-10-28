@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../include/stack.h"
-#include "../include/processor.h"
+#include "stack.h"
+#include "processor.h"
 
 
 void proc_ctor(struct processor_t* proc)
